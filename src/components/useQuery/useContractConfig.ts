@@ -15,11 +15,9 @@ const useContractConfig = (contractAddress : string) => {
       });
 
     const queryData = useQuery("get_contract_config", async () => {
-        // console.log(`┌ GET ${lcd}/cosmos/tx/v1beta1/txs`)
         const data = await lcd.wasm.contractQuery<Config>(contractAddress, {
             config : {}
         });
-        // console.log(`└ GET ${lcd}/cosmos/tx/v1beta1/txs`, data)
         return data;
     }, {
         staleTime: Infinity,

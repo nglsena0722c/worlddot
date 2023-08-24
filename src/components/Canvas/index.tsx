@@ -3,8 +3,14 @@ import "./index.css";
 import clsx from "clsx";
 import useContractConfig, { Config } from "../useQuery/useContractConfig";
 import { CircularProgress } from "@mui/material";
-import { useConnectedWallet } from "@xpla/wallet-provider";
+import {
+  TxResult,
+  ConnectedWallet,
+  useConnectedWallet,
+} from "@xpla/wallet-provider";
 import xplaToETHAddress from "../Util/xplaToETHAddress";
+import useBalance from "../useQuery/useBalance";
+import { Coin, Dec, Fee, MsgExecuteContract } from "@xpla/xpla.js";
 
 interface Dot {
   X: number;
@@ -14,7 +20,7 @@ interface Dot {
 
 const Canvas = () => {
   const contractAddress =
-    "xpla1fg8899wfvh8n5xc9repj85f6eve68c9vxas5ye8yvurf8tddksnshwpvpg";
+    "xpla10lun5dn4ls4fczf6fygufvt9wgttu0dahdf37zzexaej3axsxa9s787tqh";
   const { isLoading, data } = useContractConfig(contractAddress);
   const connectedWallet = useConnectedWallet();
 
@@ -25,7 +31,8 @@ const Canvas = () => {
   ) : (
     <CanvasPainter
       configData={data}
-      userAddress={connectedWallet.xplaAddress}
+      connectedWallet={connectedWallet}
+      contractAddress={contractAddress}
     />
   );
 };
@@ -34,11 +41,14 @@ export default Canvas;
 
 const CanvasPainter = ({
   configData,
-  userAddress,
+  connectedWallet,
+  contractAddress,
 }: {
   configData: Config;
-  userAddress: string;
+  connectedWallet: ConnectedWallet;
+  contractAddress: string;
 }) => {
+  const userAddress = connectedWallet.xplaAddress;
   const dotCount = configData.dotcount;
   const dotDoubleArray: Dot[][] = [];
   for (let i = 1; i <= dotCount; i++) {
@@ -55,12 +65,88 @@ const CanvasPainter = ({
 
   const color = "#" + xplaToETHAddress(userAddress).slice(0, 6);
   const [clicked, setClicked] = useState<string>("[]");
+  const { isLoading: balanceLoading, data: userBalance } =
+    useBalance(userAddress);
+  const [txResult, setTxResult] = useState<TxResult | null>(null);
+  const [txError, setTxError] = useState<string>(null);
 
   return (
     <>
+      <div>Contract Address : {contractAddress}</div>
+      <div>
+        Your Balance :{" "}
+        {balanceLoading ? (
+          <CircularProgress />
+        ) : (
+          <span>{userBalance.length === 0 ? "0XPLA" : userBalance}</span>
+        )}
+      </div>
       <div>Your Color : {color}</div>
       <div>Dot Width : {configData.dotcount}</div>
       <div>Lock Block Height : {configData.lock_block_height}</div>
+      <div>If you lock, you need to pay XPLA.</div>
+      <button
+        onClick={async () => {
+          const clickedArray: string[] = JSON.parse(clicked);
+          const dots = [];
+          let lockAmount = 0;
+          for (let string_dot of clickedArray) {
+            const dot = JSON.parse(string_dot);
+            const lock =
+              dot.lock === 0
+                ? null
+                : {
+                    denom: "axpla",
+                    amount: dot.lock.toString(),
+                  };
+            dots.push({
+              x: dot.X,
+              y: dot.Y,
+              color: color,
+              dot_owner: userAddress,
+              lock,
+            });
+            lockAmount += dot.lock;
+          }
+
+          const executionMsg = {
+            msgs: [
+              new MsgExecuteContract(
+                userAddress,
+                contractAddress,
+                {
+                  paint: {
+                    user: userAddress,
+                    dots,
+                  },
+                },
+                lockAmount === 0
+                  ? undefined
+                  : [new Coin("axpla", lockAmount.toString())]
+              ),
+            ],
+          };
+          const tx = await connectedWallet.post(executionMsg);
+          setTxResult(tx);
+        }}
+      >
+        paint
+      </button>
+      <div className="block rounded-lg border bg-white p-6 shadow dark:border-neutral-700 dark:bg-neutral-800 ">
+        <div className="flex items-center justify-between gap-4">
+          Result
+          {txResult && (
+            <a
+              href={`https://explorer.xpla.io/testnet/tx/${txResult.result.txhash}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {txResult.result.txhash}
+            </a>
+          )}
+          <span>{txError}</span>
+        </div>
+      </div>
       <div
         className="w-full aspect-square border-2 border-black-600 border-solid grid"
         style={{
