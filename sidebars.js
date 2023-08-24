@@ -5,7 +5,8 @@ const sidebars = {
   tutorialSidebar: [
     'WorldDot',
     'Galery - NFT Maker',
-    'Profile Maker'
+    'Profile Maker',
+    'MyDot'
   ]
 };
 

@@ -1,0 +1,7 @@
+.dot-popup {
+    display : none;
+}
+
+.dot-popup-container:hover + .dot-popup {
+    display : flex
+}
