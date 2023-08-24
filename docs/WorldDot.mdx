@@ -2,6 +2,14 @@
 # World Dot
 
 import Canvas from "@site/src/components/Canvas";
+import WalletWrap from "@site/src/components/Wallet/WalletWrap";
+import Connect from "@site/src/components/Wallet/Connect";
+import QueryWrap from "@site/src/components/useQuery/QueryWrap";
+
+<WalletWrap>
+<QueryWrap>
+
+<Connect />
 
 Your Color is ... 6개 제공함.
 
@@ -15,4 +23,7 @@ onFocus 되면 새롭게 할 거기에 push, ctrl 누르고 클릭하면 취소�
 필요한 금액도 보여주고..
 안되면 안된다고 말해주고...
 
+
 <Canvas />
+</QueryWrap>
+</WalletWrap>

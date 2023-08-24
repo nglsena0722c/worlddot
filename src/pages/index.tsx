@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import Layout from "@theme/Layout";
-
+import { QueryClient, QueryClientProvider } from "react-query";
 import {
   WalletControllerChainOptions,
   getChainOptions,
@@ -31,14 +31,18 @@ export default function Home(): JSX.Element {
       });
   }, []);
 
+  const queryClient = new QueryClient();
+
   return (
     <Layout
       title={`World Dot`}
       description="This is World Dot with XPLA Blockchain"
     >
-      <div>
-        World Dot is Cool
-      </div>
+       <QueryClientProvider client={queryClient}>
+        <div>
+          World Dot is Cool
+        </div>
+       </QueryClientProvider>
     </Layout>
   );
 }
