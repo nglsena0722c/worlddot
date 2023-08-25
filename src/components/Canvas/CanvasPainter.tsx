@@ -9,6 +9,7 @@ import { Coin, MsgExecuteContract } from "@xpla/xpla.js";
 import useLatestDots from "../useQuery/useLatestDots";
 import { Dot } from ".";
 import SingleDot from "./SingleDot";
+import useLatestBlock from "../useQuery/useLatestBlock";
 
 const CanvasPainter = ({
   configData,
@@ -21,6 +22,7 @@ const CanvasPainter = ({
 }) => {
   const dotCount = configData.dotcount;
   const [stringDotData, setStringDotData] = useState<string>("[]");
+  const {isLoading : latestBlockLoading, data : latestBlock} = useLatestBlock();
 
   useEffect(() => {
     const dotDoubleArray: Dot[][] = [];
@@ -42,12 +44,15 @@ const CanvasPainter = ({
 
   useEffect(() => {
     if (latestDots && latestDots.length !== 0) {
-      const dotDoubleArray = string2Arr(stringDotData);
+      const dotDoubleArray:Dot[][] = string2Arr(stringDotData);
       latestDots.map((latestDot) => {
         dotDoubleArray[latestDot[1].y - 1][latestDot[1].x - 1] = {
           X: latestDot[1].x,
           Y: latestDot[1].y,
           backgroundColor: latestDot[1].color,
+          dotOwner : latestDot[1].dot_owner,
+          lock_amount : latestDot[1].lock ? latestDot[1].lock.amount : "0",
+          painted_block : latestDot[0]
         };
       });
       setStringDotData(JSON.stringify(dotDoubleArray));
@@ -65,6 +70,12 @@ const CanvasPainter = ({
 
   return (
     <>
+    {
+      latestBlockLoading ? <CircularProgress /> : <div>XPLA Latest Block : {latestBlock} </div> 
+    }
+    {(latestDots && latestDots.length !== 0) && 
+    <div>lastest Changed Block : {latestDots[0][0]}</div>
+    }
       <div>Contract Address : {contractAddress}</div>
       <div>
         Your Balance :{" "}
@@ -158,7 +169,7 @@ const CanvasPainter = ({
           gridTemplateColumns: `repeat(${dotCount}, minmax(0, 1fr))`,
         }}
       >
-        {string2Arr(stringDotData).map((dotArray, idx) => {
+        {string2Arr(stringDotData).map((dotArray) => {
           return dotArray.map((dot) => {
             return (
               <SingleDot

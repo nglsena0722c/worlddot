@@ -12,7 +12,10 @@ const useLatestDots = (contractAddress: string) => {
             [number, {
                 x: number,
                 y: number,
-                lock: null | Coin,
+                lock: {
+                    denom : string,
+                    amount : string
+                } |  null,
                 dot_owner: string,
                 color: string,
             }][] > (contractAddress, {

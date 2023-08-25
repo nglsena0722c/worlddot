@@ -11,6 +11,9 @@ export interface Dot {
   X: number;
   Y: number;
   backgroundColor: string;
+  dotOwner? : string;
+  lock_amount? : string;
+  painted_block? : number;
 }
 
 const Canvas = () => {
