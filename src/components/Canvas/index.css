@@ -5,3 +5,11 @@
 .dot-popup-container:hover + .dot-popup {
     display : flex
 }
+
+.hover-gray:hover {
+    background-color: #b2b2b2 !important;
+}
+
+.hover-opacity:hover {
+    opacity: 0.6;
+}
