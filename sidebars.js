@@ -6,7 +6,8 @@ const sidebars = {
     'WorldDot',
     'Galery - NFT Maker',
     'Profile Maker',
-    'MyDot'
+    'MyDot',
+    'Claim'
   ]
 };
 
