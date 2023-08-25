@@ -11,6 +11,8 @@ import {
 import xplaToETHAddress from "../Util/xplaToETHAddress";
 import useBalance from "../useQuery/useBalance";
 import { Coin, Dec, Fee, MsgExecuteContract } from "@xpla/xpla.js";
+import useLatestDots from "../useQuery/useLatestDots";
+import useChangedBlock from "../useQuery/useChangedBlock";
 
 interface Dot {
   X: number;
@@ -20,7 +22,7 @@ interface Dot {
 
 const Canvas = () => {
   const contractAddress =
-    "xpla10lun5dn4ls4fczf6fygufvt9wgttu0dahdf37zzexaej3axsxa9s787tqh";
+    "xpla18nk58krcr4a8w4hwprt4smxavrzxsgktcl75ah7tv75vw7jfux6qezwvll";
   const { isLoading, data } = useContractConfig(contractAddress);
   const connectedWallet = useConnectedWallet();
 
@@ -48,6 +50,8 @@ const CanvasPainter = ({
   connectedWallet: ConnectedWallet;
   contractAddress: string;
 }) => {
+  const {data : latestDots} = useLatestDots(contractAddress);
+
   const userAddress = connectedWallet.xplaAddress;
   const dotCount = configData.dotcount;
   const dotDoubleArray: Dot[][] = [];
@@ -62,6 +66,19 @@ const CanvasPainter = ({
     }
     dotDoubleArray.push(dotArray);
   }
+
+  useEffect(() => {
+      if (latestDots && latestDots.length !== 0) {
+        latestDots.map((latestDot) => {
+          dotDoubleArray[latestDot[1].y - 1][latestDot[1].x - 1] = {
+            X : latestDot[1].x,
+            Y : latestDot[1].y,
+            backgroundColor : latestDot[1].color
+          }
+        })
+      }
+      console.log(dotDoubleArray);
+  }, [latestDots]);
 
   const color = "#" + xplaToETHAddress(userAddress).slice(0, 6);
   const [clicked, setClicked] = useState<string>("[]");
@@ -238,7 +255,6 @@ const SingleDot = ({
       <div
         className={clsx(
           "hover:bg-[#B2B2B2] aspect-square",
-          dot.backgroundColor === "white" ? "bg-white" : "bg-[#D9D9D9]",
           "dot-popup-container z-0 border-0"
         )}
         style={
@@ -246,7 +262,9 @@ const SingleDot = ({
             ? {
                 backgroundColor: color,
               }
-            : {}
+            : {
+              backgroundColor : dot.backgroundColor
+            }
         }
       />
       <div
