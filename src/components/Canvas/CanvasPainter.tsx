@@ -68,13 +68,14 @@ const CanvasPainter = ({
   const [txResult, setTxResult] = useState<TxResult | null>(null);
   const [txError, setTxError] = useState<string>(null);
 
+  const { lockAmount, unlockAmount} = getAmountXPLAForLock(clicked, stringDotData);
   return (
     <>
     {
       latestBlockLoading ? <CircularProgress /> : <div>XPLA Latest Block : {latestBlock} </div> 
     }
     {(latestDots && latestDots.length !== 0) && 
-    <div>lastest Changed Block : {latestDots[0][0]}</div>
+    <div>lastest Changed Block : {Math.max(...latestDots.map((v) => v[0]))}</div>
     }
       <div>Contract Address : {contractAddress}</div>
       <div>
@@ -89,11 +90,11 @@ const CanvasPainter = ({
       <div>Dot Width : {configData.dotcount}</div>
       <div>Lock Block Height : {configData.lock_block_height}</div>
       <div>If you lock, you need to pay XPLA.</div>
+      <div>You will Pay : {lockAmount + unlockAmount} aXPLA(You will unLock with {unlockAmount} aXPLA and Lock new Block with {lockAmount} aXPLA)</div>
       <button
         onClick={async () => {
           const clickedArray: string[] = JSON.parse(clicked);
           const dots = [];
-          let lockAmount = 0;
           for (let string_dot of clickedArray) {
             const dot = JSON.parse(string_dot);
             const lock =
@@ -110,7 +111,6 @@ const CanvasPainter = ({
               dot_owner: userAddress,
               lock,
             });
-            lockAmount += dot.lock;
           }
 
           const executionMsg = {
@@ -124,9 +124,9 @@ const CanvasPainter = ({
                     dots,
                   },
                 },
-                lockAmount === 0
+                (lockAmount + unlockAmount) === 0
                   ? undefined
-                  : [new Coin("axpla", lockAmount.toString())]
+                  : [new Coin("axpla", (lockAmount + unlockAmount).toString())]
               ),
             ],
           };
@@ -225,3 +225,19 @@ const string2Arr = (stringDotData: string) => {
   const dotDoubleArray = JSON.parse(stringDotData);
   return dotDoubleArray;
 };
+
+const getAmountXPLAForLock = (clicked : string, stringDotData:string) => {
+  const dotData = JSON.parse(stringDotData);
+  const clickedArray: string[] = JSON.parse(clicked);
+  let lockAmount = 0;
+  let unlockAmount = 0;
+  for (let string_dot of clickedArray) {
+    const dot = JSON.parse(string_dot);
+    unlockAmount += dotData[dot.Y-1][dot.X-1].lock_amount ? Number(dotData[dot.Y-1][dot.X-1].lock_amount) : 0;
+    lockAmount += dot.lock;
+  }
+  return {
+    lockAmount,
+    unlockAmount
+  }
+}

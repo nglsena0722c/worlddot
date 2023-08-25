@@ -2,6 +2,8 @@ import React, { Dispatch } from "react";
 import "./index.css";
 import clsx from "clsx";
 import { Dot } from ".";
+import { truncate } from '@xpla.kitchen/utils';
+
 
 const SingleDot = ({
   dot,
@@ -16,6 +18,7 @@ const SingleDot = ({
 }) => {
   const isPainted = !(dot.backgroundColor === "white" ||
   dot.backgroundColor === "#D9D9D9");
+  const save_isClicked = isClicked(dot.X, dot.Y, clicked);
 
   return (
     <div
@@ -42,15 +45,10 @@ const SingleDot = ({
         className={clsx(
           "aspect-square",
           "dot-popup-container z-0 border-0",
-          {
-            "hover-gray": !isPainted, // 유저의 color 는 소문자 color 색코드라서 유저 코드랑 겹칠일이 없다.
-          },
-          {
-            "hover-opacity": isPainted
-          }
+          (isPainted || save_isClicked) ? "hover-opacity" : "hover-gray"
         )}
         style={
-          isClicked(dot.X, dot.Y, clicked)
+          save_isClicked
             ? {
                 backgroundColor: color,
               }
@@ -69,7 +67,7 @@ const SingleDot = ({
         {
           isPainted &&
           <>
-        <br/>backgroundColor : {isClicked(dot.X, dot.Y, clicked) ? color : dot.backgroundColor}
+        <br/>backgroundColor : {save_isClicked ? color : dot.backgroundColor}
           </>
         }
         <br />
@@ -96,11 +94,3 @@ const isClicked = (X: number, Y: number, clicked: string) => {
   return clickedArr.length !== 0;
 };
 
-const truncate = (text: string | undefined, [h, t]: [number, number] = [6, 6], twoLines = false) => {
-    if (!text) return text;
-    if (h + t >= text.length) return text;
-    const head = h > 0 ? text.slice(0, h) : '';
-    const tail = t > 0 ? text.slice(-t) : '';
-    return head + (twoLines ? '\n' : '') + '...' + tail;
-}
-  
