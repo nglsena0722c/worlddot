@@ -7,12 +7,12 @@ import {
   TxResult,
   ConnectedWallet,
   useConnectedWallet,
+  UserDenied,
 } from "@xpla/wallet-provider";
 import xplaToETHAddress from "../Util/xplaToETHAddress";
 import useBalance from "../useQuery/useBalance";
 import { Coin, Dec, Fee, MsgExecuteContract } from "@xpla/xpla.js";
 import useLatestDots from "../useQuery/useLatestDots";
-import useChangedBlock from "../useQuery/useChangedBlock";
 
 interface Dot {
   X: number;
@@ -54,21 +54,27 @@ const CanvasPainter = ({
 
   const userAddress = connectedWallet.xplaAddress;
   const dotCount = configData.dotcount;
-  const dotDoubleArray: Dot[][] = [];
-  for (let i = 1; i <= dotCount; i++) {
-    const dotArray: Dot[] = [];
-    for (let j = 1; j <= dotCount; j++) {
-      dotArray.push({
-        X: j,
-        Y: i,
-        backgroundColor: (j + i) % 2 === 0 ? "white" : "gray",
-      });
+  const [stringDotData, setStringDotData] = useState<string>("[]"); 
+
+  useEffect(() => {
+    const dotDoubleArray: Dot[][] = [];
+    for (let i = 1; i <= dotCount; i++) {
+      const dotArray: Dot[] = [];
+      for (let j = 1; j <= dotCount; j++) {
+        dotArray.push({
+          X: j,
+          Y: i,
+          backgroundColor: (j + i) % 2 === 0 ? "white" : "gray",
+        });
+      }
+      dotDoubleArray.push(dotArray);
     }
-    dotDoubleArray.push(dotArray);
-  }
+    setStringDotData(JSON.stringify(dotDoubleArray))
+  }, []);
 
   useEffect(() => {
       if (latestDots && latestDots.length !== 0) {
+        const dotDoubleArray = string2Arr(stringDotData);
         latestDots.map((latestDot) => {
           dotDoubleArray[latestDot[1].y - 1][latestDot[1].x - 1] = {
             X : latestDot[1].x,
@@ -76,9 +82,10 @@ const CanvasPainter = ({
             backgroundColor : latestDot[1].color
           }
         })
+        setStringDotData(JSON.stringify(dotDoubleArray))
       }
-      console.log(dotDoubleArray);
   }, [latestDots]);
+
 
   const color = "#" + xplaToETHAddress(userAddress).slice(0, 6);
   const [clicked, setClicked] = useState<string>("[]");
@@ -143,8 +150,22 @@ const CanvasPainter = ({
               ),
             ],
           };
-          const tx = await connectedWallet.post(executionMsg);
-          setTxResult(tx);
+          try {
+
+            const tx = await connectedWallet.post(executionMsg);
+            setTxResult(tx);
+          }
+          catch (error) {
+            if (error instanceof UserDenied) {
+              setTxError('User Denied');
+            } else {
+              setTxError(
+                `Unknown Error: ${
+                  error instanceof Error ? error.message : String(error)
+                }`,
+              );
+            }
+          }
         }}
       >
         paint
@@ -170,7 +191,7 @@ const CanvasPainter = ({
           gridTemplateColumns: `repeat(${dotCount}, minmax(0, 1fr))`,
         }}
       >
-        {dotDoubleArray.map((dotArray, idx) => {
+        {string2Arr(stringDotData).map((dotArray, idx) => {
           return dotArray.map((dot) => {
             return (
               <SingleDot
@@ -292,3 +313,8 @@ const isClicked = (X: number, Y: number, clicked: string) => {
     .filter((dot) => dot.X === X && dot.Y === Y);
   return clickedArr.length !== 0;
 };
+
+const string2Arr = (stringDotData : string) => {
+  const dotDoubleArray = JSON.parse(stringDotData);
+  return dotDoubleArray;
+}
