@@ -80,7 +80,7 @@ const config = {
             type: 'docSidebar',
             sidebarId: 'tutorialSidebar',
             position: 'left',
-            label: 'Tutorial',
+            label: 'Play Game',
           },
           {
             href: 'https://github.com/xpladev',

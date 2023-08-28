@@ -8,6 +8,7 @@ const sidebars = {
     'Claim',
     'Galery - NFT Maker',
     'Profile Maker',
+    'SearchDot'
   ]
 };
 
