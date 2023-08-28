@@ -179,33 +179,36 @@ const CanvasPainter = ({
             <p>If you want to lock, you need to pay XPLA.</p>
           </p>
           {JSON.parse(clicked).map((dot, index) => {
-          const json_dot = JSON.parse(dot);
-          return (
-            <div key={index} className="my-4">
-              <div className="w-full mb-4" style={{border : "1px solid gray"}}/>
-              X: {json_dot.X}
-              <br />Y : {json_dot.Y}
-              <br />
-              Lock (You need to input only number!) : {" "}
-              <input
-                onChange={(event) => {
-                  let lockAmt = Number(event.target.value) || 0;
-                  const clickedArray: string[] = JSON.parse(clicked);
-                  const found = clickedArray.find((e) =>
-                  e.startsWith(`{"X" : ${json_dot.X},"Y" : ${json_dot.Y}`)
-                  );
-                  const idx = clickedArray.indexOf(found);
-                  clickedArray[
-                    idx
-                  ] = `{"X" : ${json_dot.X},"Y" : ${json_dot.Y}, "backgroundColor" : "${color}", "lock" : ${lockAmt}}`;
-                  setClicked(JSON.stringify(clickedArray));
-                }}
-                value={json_dot.lock}
-              />
-              <br />
-            </div>
-          );
-        })}
+            const json_dot = JSON.parse(dot);
+            return (
+              <div key={index} className="my-4">
+                <div
+                  className="w-full mb-4"
+                  style={{ border: "1px solid gray" }}
+                />
+                X: {json_dot.X}
+                <br />Y : {json_dot.Y}
+                <br />
+                Lock (You need to input only number!) :{" "}
+                <input
+                  onChange={(event) => {
+                    let lockAmt = Number(event.target.value) || 0;
+                    const clickedArray: string[] = JSON.parse(clicked);
+                    const found = clickedArray.find((e) =>
+                      e.startsWith(`{"X" : ${json_dot.X},"Y" : ${json_dot.Y}`)
+                    );
+                    const idx = clickedArray.indexOf(found);
+                    clickedArray[
+                      idx
+                    ] = `{"X" : ${json_dot.X},"Y" : ${json_dot.Y}, "backgroundColor" : "${color}", "lock" : ${lockAmt}}`;
+                    setClicked(JSON.stringify(clickedArray));
+                  }}
+                  value={json_dot.lock}
+                />
+                <br />
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -251,6 +254,7 @@ const CanvasPainter = ({
             ],
           };
           try {
+            console.log(1);
             const tx = await connectedWallet.post(executionMsg);
             setTxResult(tx);
           } catch (error) {
@@ -267,8 +271,11 @@ const CanvasPainter = ({
         }}
       >
         <div>
-          You will Pay : {lockAmount + unlockAmount} <span className="text-[#ff0000]">aXPLA</span> (You will unLock with{" "}
-          {unlockAmount} <span className="text-[#ff0000]">aXPLA</span> and Lock new Block with {lockAmount} <span className="text-[#ff0000]">aXPLA</span>)
+          You will Pay : {lockAmount + unlockAmount}{" "}
+          <span className="text-[#ff0000]">aXPLA</span> (You will unLock with{" "}
+          {unlockAmount} <span className="text-[#ff0000]">aXPLA</span> and Lock
+          new Block with {lockAmount}{" "}
+          <span className="text-[#ff0000]">aXPLA</span>)
         </div>
         If you want to paint your dot, click this button.
       </button>
@@ -284,6 +291,15 @@ const CanvasPainter = ({
               >
                 {txResult.result.txhash}
               </a>
+            </div>
+          </div>
+        </>
+      )}
+      {txError && (
+        <>
+          <div className="mt-4 block rounded-lg border bg-white p-6 shadow dark:border-neutral-700 dark:bg-neutral-800 ">
+            <div className="flex items-center justify-between gap-4">
+              Result
               <span>{txError}</span>
             </div>
           </div>
