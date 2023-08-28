@@ -256,6 +256,7 @@ const CanvasPainter = ({
           try {
             const tx = await connectedWallet.post(executionMsg);
             setTxResult(tx);
+            setClicked("[]");
           } catch (error) {
             if (error instanceof UserDenied) {
               setTxError("User Denied");
