@@ -6,6 +6,7 @@ import useContractConfig, { Config } from "../useQuery/useContractConfig";
 import useLatestBlock from "../useQuery/useLatestBlock";
 import Card from "../Card";
 import clsx from "clsx";
+import contractAddress from "../contractAddress";
 
 export interface Dot {
   X: number;
@@ -17,8 +18,6 @@ export interface Dot {
 }
 
 const MyDot = () => {
-  const contractAddress =
-    "xpla15g7usr6h3htmnrhege3s2z6sg4d8k066pvp05lp24qy3w5p2svmqtra0vq";
   const connectedWallet = useConnectedWallet();
   const { isLoading: latestBlockLoading, data: latestBlock } = useLatestBlock();
   const { isLoading: loadingContractConfig, data: contractConfig } =
@@ -88,6 +87,11 @@ const UserDotsData = ({
             datum={datum}
           />
         ))}
+        {
+          userDotsData.length === 0 && <div>
+            You don't have any dot yet.
+          </div>
+        }
       </div>
     </div>
   );

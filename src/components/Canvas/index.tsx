@@ -6,6 +6,7 @@ import {
 } from "@xpla/wallet-provider";
 import CanvasPainter from "./CanvasPainter";
 import useContractConfig from "../useQuery/useContractConfig";
+import contractAddress from "../contractAddress";
 
 export interface Dot {
   X: number;
@@ -17,8 +18,6 @@ export interface Dot {
 }
 
 const Canvas = () => {
-  const contractAddress =
-    "xpla15g7usr6h3htmnrhege3s2z6sg4d8k066pvp05lp24qy3w5p2svmqtra0vq";
   const { isLoading, data } = useContractConfig(contractAddress);
   const connectedWallet = useConnectedWallet();
 

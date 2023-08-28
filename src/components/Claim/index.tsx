@@ -11,6 +11,7 @@ import useLatestBlock from "../useQuery/useLatestBlock";
 import { MsgExecuteContract, TxResult } from "@xpla/xpla.js";
 import Card from "../Card";
 import clsx from "clsx";
+import contractAddress from "../contractAddress";
 
 export interface Dot {
   X: number;
@@ -22,8 +23,6 @@ export interface Dot {
 }
 
 const Claim = () => {
-  const contractAddress =
-    "xpla15g7usr6h3htmnrhege3s2z6sg4d8k066pvp05lp24qy3w5p2svmqtra0vq";
   const connectedWallet = useConnectedWallet();
   const { isLoading: latestBlockLoading, data: latestBlock } = useLatestBlock();
   const { isLoading: loadingContractConfig, data: contractConfig } =
@@ -66,13 +65,29 @@ const UserClaimData = ({
   contractConfig: Config;
   latestBlock: string;
 }) => {
-  const { isLoading, data: userLockData } = useUserLockData(
-    contractAddress,
-    connectedWallet.xplaAddress
-  );
+  const {
+    isSuccess,
+    status,
+    data: userLockData,
+  } = useUserLockData(contractAddress, connectedWallet.xplaAddress);
 
-  return isLoading ? (
-    <CircularProgress />
+  return !isSuccess ? (
+    status === "error" ? (
+      <div
+        className={clsx(
+          " px-8 flex flex-row items-center max-w-full bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700"
+        )}
+      >
+        <div className="p-5 w-full">
+          <h5 className="w-full flex justify-between items-center  mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+            <span>Your Lock Info :</span>
+          </h5>
+          <div>You don't have any locked dot yet.</div>
+        </div>
+      </div>
+    ) : (
+      <CircularProgress />
+    )
   ) : (
     <div
       className={clsx(
@@ -84,7 +99,7 @@ const UserClaimData = ({
           <span>Your Lock Info :</span>
         </h5>
 
-        {userLockData.map((datum) => (
+        {userLockData?.map((datum) => (
           <SingleLockData
             key={datum[1].x + datum[1].y + datum[1].lock.amount}
             contractConfig={contractConfig}
@@ -139,7 +154,8 @@ const SingleLockData = ({
               contractConfig.lock_block_height + Number(datum[0]) && (
               <div className="text-[#ff0000]">
                 {`You can't claim this dot. You need to wait ${
-                  contractConfig.lock_block_height - (Number(latestBlock) - datum[0])
+                  contractConfig.lock_block_height -
+                  (Number(latestBlock) - datum[0])
                 } block.`}
               </div>
             )}
