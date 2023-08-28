@@ -110,6 +110,7 @@ const CanvasPainter = ({
               color: color,
               dot_owner: userAddress,
               lock,
+              unlocked : lock === null ? true : false
             });
           }
 

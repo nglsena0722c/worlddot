@@ -18,7 +18,7 @@ export interface Dot {
 
 const Canvas = () => {
   const contractAddress =
-    "xpla1zl5c2yh468uksrxxz92xfuzcmgvpsc65pvr0ny4fq282twua2p7qqked4x";
+    "xpla15g7usr6h3htmnrhege3s2z6sg4d8k066pvp05lp24qy3w5p2svmqtra0vq";
   const { isLoading, data } = useContractConfig(contractAddress);
   const connectedWallet = useConnectedWallet();
 
