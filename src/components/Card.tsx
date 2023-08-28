@@ -1,37 +1,28 @@
+import clsx from "clsx";
 import React from "react";
 const Card = ({
-  imgLink,
-  imgSrc,
+  className,
   title,
-  description,
+  children,
 }: {
-  imgLink?: string;
-  imgSrc?: string;
+  className? : string
   title: string;
-  description: string;
+  children: React.ReactNode;
 }) => {
   const contents = (
-    <div className="px-8 flex flex-row items-center cursor-pointer max-w-full bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
-      {imgSrc && <img className="w-16 rounded-t-lg" src={imgSrc} alt="" />}
+    <div className={clsx("px-8 flex flex-row items-center max-w-full bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700", className)}>
       <div className="p-5">
         <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
           {title}
         </h5>
         <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">
-          {description}
+          {children}
         </p>
       </div>
     </div>
   );
 
-  return imgLink ? (
-    <a href={imgLink} target="_blank">
-
-      {contents}
-    </a>
-  ) : (
-    contents
-  );
+  return contents
 };
 
 export default Card;
