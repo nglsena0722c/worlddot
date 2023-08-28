@@ -254,7 +254,6 @@ const CanvasPainter = ({
             ],
           };
           try {
-            console.log(1);
             const tx = await connectedWallet.post(executionMsg);
             setTxResult(tx);
           } catch (error) {
