@@ -18,6 +18,7 @@ const useLatestDots = (contractAddress: string) => {
                 } |  null,
                 dot_owner: string,
                 color: string,
+                unlocked : boolean,
             }][] > (contractAddress, {
                 latest_dots: {
 

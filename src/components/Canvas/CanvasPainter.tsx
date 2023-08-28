@@ -55,6 +55,7 @@ const CanvasPainter = ({
           dotOwner: latestDot[1].dot_owner,
           lock_amount: latestDot[1].lock ? latestDot[1].lock.amount : "0",
           painted_block: latestDot[0],
+          unlocked: latestDot[1].unlocked,
         };
       });
       setStringDotData(JSON.stringify(dotDoubleArray));
@@ -72,7 +73,9 @@ const CanvasPainter = ({
 
   const { lockAmount, unlockAmount } = getAmountXPLAForLock(
     clicked,
-    stringDotData
+    stringDotData,
+    configData.lock_block_height,
+    Number(latestBlock)
   );
   return (
     <>
@@ -316,7 +319,12 @@ const string2Arr = (stringDotData: string) => {
   return dotDoubleArray;
 };
 
-const getAmountXPLAForLock = (clicked: string, stringDotData: string) => {
+const getAmountXPLAForLock = (
+  clicked: string,
+  stringDotData: string,
+  lock_block_height: number,
+  latestBlock: number
+) => {
   const dotData = JSON.parse(stringDotData);
   const clickedArray: string[] = JSON.parse(clicked);
   let lockAmount = 0;
@@ -324,7 +332,9 @@ const getAmountXPLAForLock = (clicked: string, stringDotData: string) => {
   for (let string_dot of clickedArray) {
     const dot = JSON.parse(string_dot);
     unlockAmount += dotData[dot.Y - 1][dot.X - 1].lock_amount
-      ? Number(dotData[dot.Y - 1][dot.X - 1].lock_amount)
+      ? lock_block_height + dotData[dot.Y - 1][dot.X - 1].painted_block > latestBlock
+        ? Number(dotData[dot.Y - 1][dot.X - 1].lock_amount)
+        : 0
       : 0;
     lockAmount += dot.lock;
   }

@@ -15,6 +15,7 @@ export interface Dot {
   dotOwner? : string;
   lock_amount? : string;
   painted_block? : number;
+  unlocked?: boolean;
 }
 
 const Canvas = () => {
