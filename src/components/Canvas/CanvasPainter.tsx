@@ -139,23 +139,6 @@ const CanvasPainter = ({
         />
       </div>
 
-      {txResult && (
-        <>
-          <div className="block rounded-lg border bg-white p-6 shadow dark:border-neutral-700 dark:bg-neutral-800 ">
-            <div className="flex items-center justify-between gap-4">
-              Result
-              <a
-                href={`https://explorer.xpla.io/testnet/tx/${txResult.result.txhash}`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                {txResult.result.txhash}
-              </a>
-              <span>{txError}</span>
-            </div>
-          </div>
-        </>
-      )}
       <div
         className="mt-8 w-full aspect-square border-2 border-black-600 border-solid grid"
         style={{
@@ -289,6 +272,23 @@ const CanvasPainter = ({
         </div>
         If you want to paint your dot, click this button.
       </button>
+      {txResult && (
+        <>
+          <div className="mt-4 block rounded-lg border bg-white p-6 shadow dark:border-neutral-700 dark:bg-neutral-800 ">
+            <div className="flex items-center justify-between gap-4">
+              Result
+              <a
+                href={`https://explorer.xpla.io/testnet/tx/${txResult.result.txhash}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {txResult.result.txhash}
+              </a>
+              <span>{txError}</span>
+            </div>
+          </div>
+        </>
+      )}
     </>
   );
 };
