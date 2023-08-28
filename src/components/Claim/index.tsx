@@ -62,7 +62,6 @@ const UserClaimData = ({
     contractAddress,
     connectedWallet.xplaAddress
   );
-  console.log(userLockData)
 
   return isLoading ? (
     <CircularProgress />
@@ -150,7 +149,6 @@ const SingleLockData = ({
                 ),
               ],
             };
-            console.log(executionMsg);
             try {
               const tx = await connectedWallet.post(executionMsg);
               setTxResult(tx);
